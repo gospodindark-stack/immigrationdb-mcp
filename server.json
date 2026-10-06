@@ -1,0 +1,24 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.gospodindark-stack/immigrationdb",
+  "title": "ImmigrationDB",
+  "description": "Read-only migration data: cities, visa routes, entry rules, costs, safety, climate, with sources.",
+  "version": "0.3.0",
+  "websiteUrl": "https://immigrationdb.com/data/mcp/",
+  "repository": {
+    "url": "https://github.com/gospodindark-stack/immigrationdb-mcp",
+    "source": "github"
+  },
+  "icons": [
+    {
+      "src": "https://immigrationdb.com/assets/logo-mark-green.svg",
+      "mimeType": "image/svg+xml"
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://immigrationdb.com/mcp"
+    }
+  ]
+}

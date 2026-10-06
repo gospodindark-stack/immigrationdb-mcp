@@ -1,0 +1,703 @@
+{
+  "endpoint": "https://immigrationdb.com/mcp",
+  "server": {
+    "name": "immigrationdb",
+    "version": "0.3.0"
+  },
+  "protocol_version": "2025-11-25",
+  "tools": [
+    {
+      "name": "search_destinations",
+      "description": "Arguments: query (required), limit, cursor. Search admitted ImmigrationDB country and city identities with bounded cursor pagination. Example: {\"query\":\"Berlin, Germany\",\"limit\":5} Boundary: Returns ranked public identities; it does not guess a missing country or expose data-only records.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_city",
+      "description": "Arguments: country (required), slug (required). Get one admitted city with canonical URL, claim-level facts and source metadata. Required arguments are exactly `country` (ISO 3166-1 alpha-2) and `slug` (the canonical city slug, e.g. \"berlin\" — not the display name). Example: {\"country\":\"de\",\"slug\":\"berlin\"} Boundary: Returns the backwards-compatible full city record by default; use get_city_fact for one metric.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "detail": {
+            "type": "string",
+            "enum": [
+              "summary",
+              "full"
+            ]
+          },
+          "metric_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            },
+            "maxItems": 50
+          }
+        },
+        "required": [
+          "country",
+          "slug"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_country",
+      "description": "Arguments: cc (required). Get one admitted country page record and official visa-route handoffs. It takes exactly one argument: `cc`, the ISO 3166-1 alpha-2 country code (e.g. \"de\") — not `country`. Example: {\"cc\":\"de\"} Boundary: Only public country records and their published handoffs are returned.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cc": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          }
+        },
+        "required": [
+          "cc"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_visa_routes",
+      "description": "Arguments: destination (required), purpose, limit, cursor. Search admitted destination visa and residence routes without inventing missing eligibility data. Example: {\"destination\":\"de\",\"purpose\":\"work\",\"limit\":20} Boundary: Returns sourced route families; it is reference information, not legal advice or an eligibility decision.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "destination"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_legal_route",
+      "description": "Arguments: destination (required), route_id (required). Get one admitted legal-route record with its official source. Example: {\"destination\":\"de\",\"route_id\":\"highly-skilled\"} Boundary: Missing or incomplete route fields remain explicit; the response does not infer a legal outcome.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "destination": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "route_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "destination",
+          "route_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_entry_rules",
+      "description": "Arguments: passport, destination, purpose, limit, cursor. Search passport entry rules from the admitted snapshot; unknown and unavailable decisions remain explicit. Example: {\"passport\":\"lv\",\"destination\":\"us\",\"limit\":20} Boundary: Only accepted public entry answers are returned; verify the responsible authority before travel.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "passport": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "purpose": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_entry_rule",
+      "description": "Arguments: passport (required), destination. Get one passport entry rule using the canonical legal/entry URI identity. Example: {\"passport\":\"lv\",\"destination\":\"us\"} Boundary: A missing answer is returned explicitly and is never replaced with an assumption.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "passport": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "destination": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          }
+        },
+        "required": [
+          "passport"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_reports",
+      "description": "Arguments: category, limit, cursor. List public ImmigrationDB reports by optional category with bounded cursor pagination. Example: {\"category\":\"Population\",\"limit\":20} Boundary: Lists published reports only; report rows retain their own source and method metadata.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_report",
+      "description": "Arguments: report_id (required). Get one public report envelope with canonical and machine-resource URLs. Example: {\"report_id\":\"warmest-published-cities-across-current-coverage\"} Boundary: The report response is bounded by the published report contract and does not expose review-only rows.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "report_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "report_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "resolve_city",
+      "description": "Arguments: query (required), limit. Resolve a natural-language city query to bounded ranked public candidates without silently selecting an ambiguous country. Example: {\"query\":\"Berlin, Germany\",\"limit\":5} Boundary: A bare or ambiguous city name returns candidates and ambiguity; it must not auto-select a non-exact country.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "query": {
+            "type": "string",
+            "minLength": 1
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          }
+        },
+        "required": [
+          "query"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "get_city_fact",
+      "description": "Arguments: country (required), slug (required), metric_id (required). Return exactly one public city fact with value, unit, geographic grain, dates, source and snapshot provenance. Required arguments are exactly `country` (ISO 3166-1 alpha-2), `slug` (canonical city slug, not the display name) and `metric_id`. Example: {\"country\":\"de\",\"slug\":\"berlin\",\"metric_id\":\"population_total\"} Boundary: Returns not_available or ambiguous_metric_version instead of guessing across units, periods, definitions or geographic grains.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "slug": {
+            "type": "string",
+            "minLength": 1
+          },
+          "metric_id": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [
+          "country",
+          "slug",
+          "metric_id"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_metrics",
+      "description": "Arguments: country, block, query, comparison_eligible, limit, cursor. List reviewed metric definitions and observed public snapshot coverage with bounded filters and pagination. Example: {\"query\":\"population\",\"country\":\"de\",\"limit\":20} Boundary: Descriptions and units come from the reviewed registry; missing ontology is reported as a contract gap, not generated from a label.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "block": {
+            "type": "string",
+            "minLength": 1
+          },
+          "query": {
+            "type": "string"
+          },
+          "comparison_eligible": {
+            "type": "boolean"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "list_blocks",
+      "description": "Arguments: limit, cursor. List stable reviewed metric blocks with observed metric, fact and country coverage. Example: {\"limit\":20} Boundary: Block order and IDs are deterministic; coverage counts describe the current public snapshot only.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "compare_cities",
+      "description": "Arguments: cities (required), metric_ids (required). Compare canonical public cities on compatible metric definitions with provenance for every cell. Example: {\"cities\":[{\"country\":\"de\",\"slug\":\"berlin\"},{\"country\":\"de\",\"slug\":\"munich\"}],\"metric_ids\":[\"population_total\"]} Boundary: Incompatible units, periods, definitions or grains are omitted with reasons; no implicit currency, period or geography conversion occurs.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "cities": {
+            "type": "array",
+            "minItems": 2,
+            "maxItems": 10,
+            "items": {
+              "oneOf": [
+                {
+                  "type": "string",
+                  "minLength": 1
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "country": {
+                      "type": "string",
+                      "minLength": 2,
+                      "maxLength": 2,
+                      "pattern": "^[A-Za-z]{2}$"
+                    },
+                    "slug": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "country",
+                    "slug"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "metric_ids": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 20,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "required": [
+          "cities",
+          "metric_ids"
+        ],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    },
+    {
+      "name": "search_facts",
+      "description": "Arguments: countries, filters, sort_metric, sort_order, limit, cursor, diagnostic. Run bounded deterministic numeric filters over eligible public city facts with explicit counts and provenance. Example: {\"countries\":[\"de\"],\"filters\":[{\"metric_id\":\"population_total\",\"op\":\">\",\"value\":100000}],\"sort_metric\":\"population_total\",\"sort_order\":\"desc\",\"limit\":20} Boundary: Filters are ANDed, results are capped and tie-broken by canonical entity ID; wrong-grain or non-comparable facts are excluded unless diagnostic mode is explicit.",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 2,
+            "pattern": "^[A-Za-z]{2}$"
+          },
+          "countries": {
+            "type": "array",
+            "maxItems": 39,
+            "items": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 2,
+              "pattern": "^[A-Za-z]{2}$"
+            }
+          },
+          "filters": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "metric_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "gt",
+                    "gte",
+                    "lt",
+                    "lte",
+                    "eq",
+                    "neq",
+                    ">",
+                    ">=",
+                    "<",
+                    "<=",
+                    "="
+                  ]
+                },
+                "operator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "metric_id",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "metric_filters": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "object",
+              "properties": {
+                "metric_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "op": {
+                  "type": "string",
+                  "enum": [
+                    "gt",
+                    "gte",
+                    "lt",
+                    "lte",
+                    "eq",
+                    "neq",
+                    ">",
+                    ">=",
+                    "<",
+                    "<=",
+                    "="
+                  ]
+                },
+                "operator": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "value": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "metric_id",
+                "value"
+              ],
+              "additionalProperties": false
+            }
+          },
+          "sort_metric": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sort": {
+            "type": "object",
+            "properties": {
+              "metric_id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "direction": {
+                "type": "string",
+                "enum": [
+                  "asc",
+                  "desc"
+                ]
+              }
+            },
+            "required": [
+              "metric_id"
+            ],
+            "additionalProperties": false
+          },
+          "sort_order": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "sort_direction": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "direction": {
+            "type": "string",
+            "enum": [
+              "asc",
+              "desc"
+            ]
+          },
+          "diagnostic": {
+            "type": "boolean"
+          },
+          "diagnostic_view": {
+            "type": "boolean"
+          },
+          "limit": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 100
+          },
+          "cursor": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
+      "annotations": {
+        "readOnlyHint": true,
+        "destructiveHint": false,
+        "idempotentHint": true,
+        "openWorldHint": false
+      }
+    }
+  ],
+  "resource_templates": [
+    {
+      "name": "city",
+      "uriTemplate": "immigrationdb://city/{country}/{slug}",
+      "title": "City",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "legal-route",
+      "uriTemplate": "immigrationdb://legal/routes/{country}/{route_id}",
+      "title": "Legal route",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "entry-rule",
+      "uriTemplate": "immigrationdb://legal/entry/{passport}/{destination}",
+      "title": "Passport entry rule",
+      "mimeType": "application/json"
+    },
+    {
+      "name": "entry-rules-by-passport",
+      "uriTemplate": "immigrationdb://legal/entry/{passport}",
+      "title": "Passport entry rules",
+      "mimeType": "application/json"
+    }
+  ]
+}
