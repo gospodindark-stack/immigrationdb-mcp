@@ -1,12 +1,12 @@
 {
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
-  "name": "io.github.gospodindark-stack/immigrationdb",
+  "name": "io.github.streltcoff/immigrationdb",
   "title": "ImmigrationDB",
   "description": "Read-only migration data: cities, visa routes, entry rules, costs, safety, climate, with sources.",
   "version": "0.3.0",
   "websiteUrl": "https://immigrationdb.com/",
   "repository": {
-    "url": "https://github.com/gospodindark-stack/immigrationdb-mcp",
+    "url": "https://github.com/streltcoff/immigrationdb-mcp",
     "source": "github"
   },
   "icons": [
