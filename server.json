@@ -4,7 +4,7 @@
   "title": "ImmigrationDB",
   "description": "Read-only migration data: cities, visa routes, entry rules, costs, safety, climate, with sources.",
   "version": "0.3.0",
-  "websiteUrl": "https://immigrationdb.com/data/mcp/",
+  "websiteUrl": "https://immigrationdb.com/",
   "repository": {
     "url": "https://github.com/gospodindark-stack/immigrationdb-mcp",
     "source": "github"
